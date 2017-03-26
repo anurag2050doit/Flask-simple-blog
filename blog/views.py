@@ -3,7 +3,7 @@ from flask import render_template, redirect, flash , url_for
 from blog.models import Blog
 from user.models import User
 from blog.form import SetupForm
-
+from user.decorator import login_required
 
 @app.route('/')
 @app.route('/index')
@@ -11,6 +11,7 @@ def index():
     return "Hello World!"
 
 @app.route('/admin')
+@login_required
 def admin():
     blogs = Blog.query.count()
     if blogs == 0:
