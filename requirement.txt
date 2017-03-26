@@ -3,3 +3,5 @@ mysql-python
 flask-sqlalchemy
 flask-script
 flask-wtf
+flask-migrate
+py-bcrypt

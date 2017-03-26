@@ -1,8 +1,9 @@
 from flask_blog import app
 from user.form import ResgisterForm, LoginForm
-from flask import render_template, redirect, session, request
+from flask import render_template, redirect, url_for, session, request
 from user.models import User
 from user.decorator import login_required
+import bcrypt
 
 @app.route('/login', methods=('GET','POST'))
 def login():
@@ -15,18 +16,24 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(
             username = form.username.data,
-            password = form.password.data
-        ).limit(1)
-        if user.count():
-            session['username'] = form.username.data
-            if 'next' in session:
-                next = session.get('next')
-                session.pop('next')
-                return redirect(next)
-            return redirect('/login_success')
+        ).first()
+        if user:
+            if bcrypt.hashpw(form.password.data, user.password) == user.password:
+                session['username'] = form.username.data
+                session['is_author'] = user.is_author
+                if 'next' in session:
+                    next = session.get('next')
+                    session.pop('next')
+                    return redirect(next)
+                return redirect('/login_success')
         else:
             error = 'Incorrect Username and Password'
     return render_template('user/login.html', form=form, error=error)
+
+@app.route('/logout')
+def logout():
+    session.pop('username')
+    return redirect(url_for('index'))
 
 @app.route('/login_success')
 @login_required
