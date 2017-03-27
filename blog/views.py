@@ -15,7 +15,8 @@ def index():
 @app.route('/admin')
 @author_required
 def admin():
-    return render_template('blog/admin.html')
+    posts = Post.query.order_by(Post.publish_data.desc())
+    return render_template('blog/admin.html',posts=posts)
 
 @app.route('/setup', methods=('GET','POST'))
 def setup():
