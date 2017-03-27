@@ -25,7 +25,7 @@ def login():
                     next = session.get('next')
                     session.pop('next')
                     return redirect(next)
-                return redirect('/login_success')
+                return redirect(url_for('index'))
         else:
             error = 'Incorrect Username and Password'
     return render_template('user/login.html', form=form, error=error)
@@ -36,10 +36,6 @@ def logout():
     session.pop('is_author')
     return redirect(url_for('index'))
 
-@app.route('/login_success')
-@login_required
-def login_success():
-    return 'Author Login in'
 
 @app.route('/register', methods=('GET', 'POST'))
 def register():

@@ -1,3 +1,4 @@
 SECRET_KEY = "SECRET_KEY"
 DEBUG = True
 SQLALCHEMY_DATABASE_URI = 'sqlite:///blog.sqlite3'
+POSTS_PER_PAGE = 5
