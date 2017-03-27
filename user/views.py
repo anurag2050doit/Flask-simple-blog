@@ -33,6 +33,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('username')
+    session.pop('is_author')
     return redirect(url_for('index'))
 
 @app.route('/login_success')

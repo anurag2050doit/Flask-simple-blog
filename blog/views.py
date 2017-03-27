@@ -10,9 +10,12 @@ from slugify import slugify
 @app.route('/')
 @app.route('/index')
 def index():
-    return "Hello World!"
+    blog = Blog.query.first()
+    posts = Post.query.order_by(Post.publish_data.desc())
+    return render_template('blog/index.html', blog=blog, posts=posts)
 
 @app.route('/admin')
+@login_required
 @author_required
 def admin():
     posts = Post.query.order_by(Post.publish_data.desc())
