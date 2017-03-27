@@ -1,10 +1,11 @@
 from flask_blog import app , db
 from flask import render_template, redirect, flash , url_for, abort , session
-from blog.models import Blog
+from blog.models import Blog, Post, Category
 from user.models import User
-from blog.form import SetupForm
-from user.decorator import login_required
+from blog.form import SetupForm, PostForm
+from user.decorator import login_required, author_required
 import bcrypt
+from slugify import slugify
 
 @app.route('/')
 @app.route('/index')
@@ -12,18 +13,15 @@ def index():
     return "Hello World!"
 
 @app.route('/admin')
-@login_required
+@author_required
 def admin():
-    blogs = Blog.query.count()
-    if blogs == 0:
-        return redirect(url_for('setup'))
-    if session.get('is_author'):
-        return render_template('blog/admin.html')
-    else:
-        abort(403)
+    return render_template('blog/admin.html')
 
 @app.route('/setup', methods=('GET','POST'))
 def setup():
+    blogs = Blog.query.count()
+    if blogs:
+        return redirect(url_for('admin'))
     form = SetupForm()
     error = None
     if form.validate_on_submit():
@@ -54,7 +52,25 @@ def setup():
             error = "Error creating blog"
     return   render_template('blog/setup.html', form=form, error=error)
 
-@app.route('/post')
-@login_required
+@app.route('/post', methods=('GET', 'POST'))
+@author_required
 def post():
-    return "Blog Post"
+    form = PostForm()
+    if form.validate_on_submit():
+        if form.new_category.data:
+            new_category = Category(form.new_category.data)
+            db.session.add(new_category)
+            db.session.flush()
+            category = new_category
+        else:
+            category = form.category.data
+        blog = Blog.query.first()
+        author = User.query.filter_by(username=session['username']).first()
+        title = form.title.data
+        body = form.body.data
+        slug = slugify(title)
+        post = Post(blog,author,title,body,category,slug)
+        db.session.add(post)
+        db.session.commit()
+        return redirect(url_for('admin'))
+    return render_template('blog/post.html', form=form)
