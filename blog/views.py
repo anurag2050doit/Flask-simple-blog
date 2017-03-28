@@ -1,5 +1,5 @@
-from flask_blog import app , db
-from flask import render_template, redirect, flash , url_for, abort , session
+from flask_blog import app , db , uploaded_images
+from flask import render_template, redirect, flash , url_for, abort , session, request
 from blog.models import Blog, Post, Category
 from user.models import User
 from blog.form import SetupForm, PostForm
@@ -64,6 +64,12 @@ def setup():
 def post():
     form = PostForm()
     if form.validate_on_submit():
+        image = request.files.get('image')
+        filename = None
+        try:
+            filename = uploaded_images.save(image)
+        except:
+            flash("The image was not Uploaded")
         if form.new_category.data:
             new_category = Category(form.new_category.data)
             db.session.add(new_category)
@@ -76,7 +82,7 @@ def post():
         title = form.title.data
         body = form.body.data
         slug = slugify(title)
-        post = Post(blog,author,title,body,category,slug)
+        post = Post(blog,author,title,body,category,slug, filename)
         db.session.add(post)
         db.session.commit()
         return redirect(url_for('article', slug=slug))
