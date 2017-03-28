@@ -86,7 +86,14 @@ def post():
         db.session.add(post)
         db.session.commit()
         return redirect(url_for('article', slug=slug))
-    return render_template('blog/post.html', form=form)
+    return render_template('blog/post.html', form=form, action="new")
+
+@app.route('/edit/<int:post_id>', methods=('GET', 'POST'))
+@author_required
+def edit(post_id):
+    post = Post.query.filter_by(id=post_id).first_or_404()
+    form = PostForm(obj=post)
+    return render_template('blog/post.html', form=form, post=post, action="edit")
 
 
 @app.route('/article/<slug>')
