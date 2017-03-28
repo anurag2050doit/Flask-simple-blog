@@ -12,9 +12,11 @@
     {% endif %}
 
     <div class="row">
+      <br>
       <div class="col-md-10">
           <h3>{{ post.title }}</h3>
       </div>
+      <br>
       <div class="col-md-1">
         {% if session.get('is_author') %}
           <a href="{{ url_for('edit', post_id=post.id) }}">
@@ -24,7 +26,7 @@
       </div>
       <div class="col-md-1">
         {% if session.get('is_author') %}
-          <a href="{{ url_for('edit', post_id=post.id) }}">
+          <a href="{{ url_for('delete', post_id=post.id) }}">
             <button class="btn btn-default"> Delete </button>
           </a>
         {% endif %}

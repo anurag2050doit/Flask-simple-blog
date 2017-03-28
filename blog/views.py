@@ -13,7 +13,7 @@ from slugify import slugify
 @app.route('/index/<int:page>')
 def index(page=1):
     blog = Blog.query.first()
-    posts = Post.query.order_by(Post.publish_data.desc()).paginate(page, app.config['POSTS_PER_PAGE'], False)
+    posts = Post.query.filter_by(live=True).order_by(Post.publish_data.desc()).paginate(page, app.config['POSTS_PER_PAGE'], False)
     return render_template('blog/index.html', blog=blog, posts=posts)
 
 @app.route('/admin')
@@ -21,7 +21,7 @@ def index(page=1):
 @login_required
 @author_required
 def admin(page=1):
-    posts = Post.query.order_by(Post.publish_data.desc()).paginate(page, app.config['POSTS_PER_PAGE'], False)
+    posts = Post.query.filter_by(live=True).order_by(Post.publish_data.desc()).paginate(page, app.config['POSTS_PER_PAGE'], False)
     return render_template('blog/admin.html',posts=posts)
 
 @app.route('/setup', methods=('GET','POST'))
@@ -116,6 +116,14 @@ def edit(post_id):
 
     return render_template('blog/post.html', form=form, post=post, action="edit")
 
+@app.route('/delete/<int:post_id>', methods=('GET', 'POST'))
+@author_required
+def delete(post_id):
+    post = Post.query.filter_by(id=post_id).first_or_404()
+    post.live = False
+    db.session.commit()
+    flash("Article deleted")
+    return redirect(url_for('admin'))
 
 @app.route('/article/<slug>')
 def article(slug):
