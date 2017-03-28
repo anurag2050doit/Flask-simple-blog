@@ -26,5 +26,5 @@ python manage.py runserver
 Open brower visit [Localhost](https://127.0.0.1)
 
 
-**Enjoy BASIC BLOG APP **
+** Enjoy BASIC BLOG APP **
 
