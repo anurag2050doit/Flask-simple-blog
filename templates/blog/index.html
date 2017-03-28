@@ -8,22 +8,33 @@
     <hr>
     <div class="post-list">
       {% for post in posts.items %}
-        <div class="post-item">
-          <h4>
-            <a href="{{ url_for('article', slug=post.slug ) }}">
-              {{ post.title }}
-            </a>
-          </h4>
-          <div class="post-body">
-            {{ post.body[:220]+" ..." }}
+        <div class="row post-item">
+          <div class="col-md-9">
+            <h4>
+              <a href="{{ url_for('article', slug=post.slug ) }}">
+                {{ post.title }}
+              </a>
+            </h4>
+            <div class="post-body">
+              {{ post.body[:220]+" ..." }}
+            </div>
+            <div class="text-muted">
+              Posted by {{ post.author.fullname }} on {{ post.publish_data.strftime('%Y-%m-%d') }} in {{ post.category.name }}
+            </div>
           </div>
-          <div class="text-muted">
-            Posted by {{ post.author.fullname }} on {{ post.publish_data.strftime('%Y-%m-%d') }} in {{ post.category.name }}
+          <div class="col-md-3">
+            {% if post.image %}
+              <img src="{{ post.imgsrc }}" alt="{{ post.image }}" height="100px" class="img-round">
+            {% endif %}
           </div>
         </div>
+        <br>
+        <hr>
       {% endfor %}
     </div>
-    <div class="post-paginate">
+    <br>
+    <br>
+    <div class="center post-paginate">
       {% if posts.has_prev %}
         <a href="{{ url_for('index', page=posts.prev_num) }}">
         &lt;&lt; Newer posts
